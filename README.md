@@ -10,7 +10,8 @@ Install Qt 5.
 
 ```sh
 $ qmake
-$ make
+$ make debug
+$ make release
 ```
 
 Executable is located in `build/`.

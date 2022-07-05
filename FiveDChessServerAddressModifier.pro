@@ -23,6 +23,7 @@ TRANSLATIONS += \
 
 CONFIG += lrelease
 CONFIG += embed_translations
+CONFIG += debug_and_release
 
 # Linux
 release:DESTDIR = build/Release
