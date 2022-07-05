@@ -15,9 +15,6 @@ MainWindow::MainWindow(QWidget *parent)
     QPalette palette;
     palette.setColor(QPalette::Text, Qt::GlobalColor::gray);
     ui->lineEditAddress->setPalette(palette);
-#ifdef Q_OS_WIN
-    ui->label->setText("");
-#endif
 }
 
 MainWindow::~MainWindow()
@@ -339,40 +336,44 @@ bool MainWindow::addressAndPort(QByteArray &address, QByteArray &port)
 
 void MainWindow::infoProcessNotSelected()
 {
-    QMessageBox::information(this, "Information", "No process is selected. Make sure the game is running.", QMessageBox::Ok);
+    QMessageBox::information(this, tr("Information"), tr("No process is selected. Make sure the game is running."), QMessageBox::Ok);
 }
 
 void MainWindow::infoSuccess()
 {
-    QMessageBox::information(this, "Information", "Server address Modified successfully.", QMessageBox::Ok);
+    QMessageBox::information(this, tr("Information"), tr("Server address modified successfully."), QMessageBox::Ok);
 }
 
 void MainWindow::errorAddressInvalid()
 {
-    QMessageBox::critical(this, "Critical Error", "Address is invalid.", QMessageBox::Ok);
+    QMessageBox::critical(this, tr("Critical Error"), tr("Address is invalid."), QMessageBox::Ok);
 }
 
 void MainWindow::errorAddressTooLong()
 {
-    QMessageBox::critical(this, "Critical Error", "Address (excluding port) cannot be longer than 44 characters.", QMessageBox::Ok);
+    QMessageBox::critical(this, tr("Critical Error"), tr("Address (excluding port) cannot be longer than 44 characters."), QMessageBox::Ok);
 }
 
 void MainWindow::errorProcessInvalid()
 {
-    QMessageBox::critical(this, "Critical Error", "Process is invalid. Make sure the correct process is selected.", QMessageBox::Ok);
+    QMessageBox::critical(this, tr("Critical Error"), tr("Process is invalid. Make sure the correct process is selected."), QMessageBox::Ok);
 }
 
 void MainWindow::errorCannotAccessGameMemory()
 {
-    QMessageBox::critical(this, "Critical Error", "Cannot access game memory. Root permission may be required.", QMessageBox::Ok);
+#ifdef Q_OS_LINUX
+    QMessageBox::critical(this, tr("Critical Error"), tr("Cannot access game memory. Root permission may be required."), QMessageBox::Ok);
+#elif Q_OS_WIN
+    QMessageBox::critical(this, tr("Critical Error"), tr("Cannot access game memory."), QMessageBox::Ok);
+#endif
 }
 
 void MainWindow::errorFailedSearchGameMemory()
 {
-    QMessageBox::critical(this, "Critical Error", "Cannot find specific location in game memory. Game may need to restart.", QMessageBox::Ok);
+    QMessageBox::critical(this, tr("Critical Error"), tr("Cannot find specific location in game memory. Game may need to restart."), QMessageBox::Ok);
 }
 
-void MainWindow::errorUnmatchedGameVersion()
-{
-    QMessageBox::critical(this, "Critical Error", "Only game version 1.1.0.0f-11-16 is supported.", QMessageBox::Ok);
-}
+//void MainWindow::errorUnmatchedGameVersion()
+//{
+//    QMessageBox::critical(this, tr("Critical Error"), tr("Only game version 1.1.0.0f-11-16 is supported."), QMessageBox::Ok);
+//}
