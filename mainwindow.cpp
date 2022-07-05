@@ -14,7 +14,7 @@ MainWindow::MainWindow(QWidget *parent)
     palette.setColor(QPalette::Text, Qt::GlobalColor::gray);
     ui->lineEditAddress->setPalette(palette);
 #ifdef Q_OS_WIN
-    ui->label->setText("UAC permission may be required to access game memory.");
+    ui->label->setText("");
 #endif
 }
 
@@ -82,17 +82,18 @@ void MainWindow::on_pushButtonModify_clicked()
     if (version_0 == VERSION_0)
     {
         RET_VOID_ON_ERR(readProcessMemory(process, base + OFFSET_VERSION_1, 8, version_buffer));
-        qint64 version_12;
+        qint64 version_1;
         QDataStream version_datastream(QByteArray(version_buffer, 8));
         version_datastream.setByteOrder(QDataStream::LittleEndian);
-        version_datastream >> version_12;
-        if (version_12 == VERSION_1)
+        version_datastream >> version_1;
+        if (version_1 == VERSION_1)
         {
             RET_VOID_ON_ERR(readProcessMemory(process, base + OFFSET_VERSION_2, 8, version_buffer));
+            qint64 version_2;
             QDataStream version_datastream(QByteArray(version_buffer, 8));
             version_datastream.setByteOrder(QDataStream::LittleEndian);
-            version_datastream >> version_12;
-            if (version_12 == VERSION_2)
+            version_datastream >> version_2;
+            if (version_2 == VERSION_2)
             {
                 QByteArray address;
                 QByteArray port;
