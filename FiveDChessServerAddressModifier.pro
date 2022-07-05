@@ -49,6 +49,8 @@ Debug:MOC_DIR = build/Debug/.moc
 Debug:RCC_DIR = build/Debug/.rcc
 Debug:UI_DIR = build/Debug/.ui
 
+TARGET = 5DChessServerAddressModifier
+
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin

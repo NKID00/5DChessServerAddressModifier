@@ -43,6 +43,8 @@ constexpr qint64 OFFSET_PORT = 0xefc81;
 extern const QByteArray VERSION_0;
 constexpr qint64 VERSION_1 = 11;
 constexpr qint64 VERSION_2 = 16;
+extern const QByteArray OFFICIAL_ADDRESS;
+extern const QByteArray OFFICIAL_PORT;
 
 class MainWindow : public QMainWindow
 {
@@ -58,9 +60,10 @@ private slots:
     void on_pushButtonModify_clicked();
 
 private:
-    qint64 processMemoryBase(process_handle_t process);
-    bool readProcessMemory(process_handle_t process, qint64 addr, qint64 size, char *buffer);
-    bool writeProcessMemory(process_handle_t process, qint64 addr, qint64 size, const char *buffer);
+    bool processMemoryBaseSize(process_handle_t process, qint64 &base, qint64 &size);
+    bool readProcessMemory(process_handle_t process, qint64 addr, qint64 size, QByteArray &data);
+    bool writeProcessMemory(process_handle_t process, qint64 addr, const QByteArray &data);
+    qint64 searchProcessMemory(process_handle_t process, qint64 base, qint64 size, const QByteArray &data);
     bool hasSelectedProcess();
     process_handle_t selectedProcess();
     bool addressAndPort(QByteArray &address, QByteArray &port);
@@ -68,7 +71,9 @@ private:
     void infoSuccess();
     void errorAddressInvalid();
     void errorAddressTooLong();
+    void errorProcessInvalid();
     void errorCannotAccessGameMemory();
+    void errorFailedSearchGameMemory();
     void errorUnmatchedGameVersion();
     Ui::MainWindow *ui;
 };

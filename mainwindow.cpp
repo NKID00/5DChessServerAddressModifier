@@ -1,7 +1,9 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
-const QByteArray VERSION_0 = QByteArrayLiteral("1.1.0.0f\x00");
+const QByteArray VERSION_0 = QByteArrayLiteral("1.1.0.0f\0");
+const QByteArray OFFICIAL_ADDRESS = QByteArrayLiteral("matches.5dchesswithmultiversetimetravel.com\0");
+const QByteArray OFFICIAL_PORT = QByteArrayLiteral("39005\0");
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -74,88 +76,136 @@ void MainWindow::on_pushButtonModify_clicked()
         return;
     }
     auto process = selectedProcess();
-    auto base = processMemoryBase(process);
-    RET_VOID_ON_ERR(base);
-    char version_buffer[9];
-    RET_VOID_ON_ERR(readProcessMemory(process, base + OFFSET_VERSION_0, 9, version_buffer));
-    QByteArray version_0(version_buffer, 9);
-    if (version_0 == VERSION_0)
+    qint64 base, size;
+    RET_VOID_ON_ERR(processMemoryBaseSize(process, base, size));
+
+//    QByteArray version_bytes;
+//    RET_VOID_ON_ERR(readProcessMemory(process, base + OFFSET_VERSION_0, 9, version_bytes));
+//    if (version_bytes == VERSION_0)
+//    {
+//        RET_VOID_ON_ERR(readProcessMemory(process, base + OFFSET_VERSION_1, 8, version_bytes));
+//        qint64 version_1;
+//        QDataStream version_datastream(version_bytes);
+//        version_datastream.setByteOrder(QDataStream::LittleEndian);
+//        version_datastream >> version_1;
+//        if (version_1 == VERSION_1)
+//        {
+//            RET_VOID_ON_ERR(readProcessMemory(process, base + OFFSET_VERSION_2, 8, version_bytes));
+//            qint64 version_2;
+//            QDataStream version_datastream(version_bytes);
+//            version_datastream.setByteOrder(QDataStream::LittleEndian);
+//            version_datastream >> version_2;
+//            if (version_2 == VERSION_2)
+//            {
+//                QByteArray address;
+//                QByteArray port;
+//                RET_VOID_ON_ERR(addressAndPort(address, port));
+//                RET_VOID_ON_ERR(writeProcessMemory(process, base + OFFSET_ADDRESS, address));
+//                RET_VOID_ON_ERR(writeProcessMemory(process, base + OFFSET_PORT, port));
+//                infoSuccess();
+//                return;
+//            }
+//        }
+//    }
+//    errorUnmatchedGameVersion();
+
+    QByteArray address, port;
+    RET_VOID_ON_ERR(addressAndPort(address, port));
+    if (address != OFFICIAL_ADDRESS)
     {
-        RET_VOID_ON_ERR(readProcessMemory(process, base + OFFSET_VERSION_1, 8, version_buffer));
-        qint64 version_1;
-        QDataStream version_datastream(QByteArray(version_buffer, 8));
-        version_datastream.setByteOrder(QDataStream::LittleEndian);
-        version_datastream >> version_1;
-        if (version_1 == VERSION_1)
-        {
-            RET_VOID_ON_ERR(readProcessMemory(process, base + OFFSET_VERSION_2, 8, version_buffer));
-            qint64 version_2;
-            QDataStream version_datastream(QByteArray(version_buffer, 8));
-            version_datastream.setByteOrder(QDataStream::LittleEndian);
-            version_datastream >> version_2;
-            if (version_2 == VERSION_2)
-            {
-                QByteArray address;
-                QByteArray port;
-                RET_VOID_ON_ERR(addressAndPort(address, port));
-                RET_VOID_ON_ERR(writeProcessMemory(process, base + OFFSET_ADDRESS, address.length(), address));
-                RET_VOID_ON_ERR(writeProcessMemory(process, base + OFFSET_PORT, port.length(), port));
-                infoSuccess();
-                return;
-            }
-        }
+        auto target = searchProcessMemory(process, base, size, OFFICIAL_ADDRESS);
+        RET_VOID_ON_ERR(target);
+        RET_VOID_ON_ERR(writeProcessMemory(process, target, address));
     }
-    errorUnmatchedGameVersion();
+    if (port != OFFICIAL_PORT)
+    {
+        auto target = searchProcessMemory(process, base, size, OFFICIAL_PORT);
+        RET_VOID_ON_ERR(target);
+        RET_VOID_ON_ERR(writeProcessMemory(process, target, port));
+    }
+    infoSuccess();
 }
 
-qint64 MainWindow::processMemoryBase(process_handle_t process)
+bool MainWindow::processMemoryBaseSize(process_handle_t process, qint64 &base, qint64 &size)
 {
 #ifdef Q_OS_LINUX
     QFile f("/proc/" + process + "/maps");
     if (!f.exists())
     {
-        return 0;
+        errorProcessInvalid();
+        return false;
     }
     f.open(QIODevice::ReadOnly);
-    qint64 base = 0;
-    char buffer[1];
-    while (f.isReadable())
+    if (!f.isOpen())
     {
-        f.read(buffer, 1);
-        char c = buffer[0];
-        if ('0' <= c && c <= '9')
+        errorCannotAccessGameMemory();
+        return false;
+    }
+
+    auto parts = f.readLine().split('-');
+    if (parts.size() < 2)
+    {
+        errorCannotAccessGameMemory();
+        return false;
+    }
+    base = parts[0].toULongLong(nullptr, 16);
+    if (base <= 0)
+    {
+        errorCannotAccessGameMemory();
+        return false;
+    }
+
+    qint64 addr = 0;
+    for (QByteArray line = f.readLine(); line.contains(QByteArrayLiteral("5dchesswithmultiversetimetravel")); line = f.readLine())
+    {
+        parts = f.readLine().split('-');
+        if (parts.size() < 2)
         {
-            base *= 16;
-            base += c - '0';
+            errorCannotAccessGameMemory();
+            return false;
         }
-        else if ('a' <= c && c <= 'f')
+        parts = parts[1].split(' ');
+        if (parts.size() < 2)
         {
-            base *= 16;
-            base += c - 'a' + 10;
+            errorCannotAccessGameMemory();
+            return false;
         }
-        else
+        addr = parts[0].toULongLong(nullptr, 16);
+        if (addr <= 0)
         {
-            return base;
+            errorCannotAccessGameMemory();
+            return false;
         }
     }
-    errorCannotAccessGameMemory();
-    return -1;
+    if (addr <= base)
+    {
+        errorCannotAccessGameMemory();
+        return false;
+    }
+    size = addr - base;
 #elif Q_OS_WIN
 #endif
+    return true;
 }
 
-bool MainWindow::readProcessMemory(process_handle_t process, qint64 addr, qint64 size, char *buffer)
+bool MainWindow::readProcessMemory(process_handle_t process, qint64 addr, qint64 size, QByteArray &data)
 {
 #ifdef Q_OS_LINUX
     QFile f("/proc/" + process + "/mem");
     if (!f.exists())
     {
-        errorCannotAccessGameMemory();
+        errorProcessInvalid();
         return false;
     }
     f.open(QIODevice::ReadOnly);
+    if (!f.isOpen())
+    {
+        errorCannotAccessGameMemory();
+        return false;
+    }
     f.seek(addr);
-    if (f.read(buffer, size) != size)
+    data = f.read(size);
+    if (data.size() != size)
     {
         errorCannotAccessGameMemory();
         return false;
@@ -165,18 +215,23 @@ bool MainWindow::readProcessMemory(process_handle_t process, qint64 addr, qint64
     return true;
 }
 
-bool MainWindow::writeProcessMemory(process_handle_t process, qint64 addr, qint64 size, const char *buffer)
+bool MainWindow::writeProcessMemory(process_handle_t process, qint64 addr, const QByteArray &data)
 {
 #ifdef Q_OS_LINUX
     QFile f("/proc/" + process + "/mem");
     if (!f.exists())
     {
-        errorCannotAccessGameMemory();
+        errorProcessInvalid();
         return false;
     }
     f.open(QIODevice::WriteOnly);
+    if (!f.isOpen())
+    {
+        errorCannotAccessGameMemory();
+        return false;
+    }
     f.seek(addr);
-    if (f.write(buffer, size) != size)
+    if (f.write(data) != data.size())
     {
         errorCannotAccessGameMemory();
         return false;
@@ -184,6 +239,39 @@ bool MainWindow::writeProcessMemory(process_handle_t process, qint64 addr, qint6
 #elif Q_OS_WIN
 #endif
     return true;
+}
+
+qint64 MainWindow::searchProcessMemory(process_handle_t process, qint64 base, qint64 size, const QByteArray &data)
+{
+#ifdef Q_OS_LINUX
+    QFile f("/proc/" + process + "/mem");
+    if (!f.exists())
+    {
+        errorProcessInvalid();
+        return false;
+    }
+    f.open(QIODevice::ReadOnly);
+    if (!f.isOpen())
+    {
+        errorCannotAccessGameMemory();
+        return false;
+    }
+    f.seek(base);
+    auto memory = f.read(size);
+    if (memory.size() != size)
+    {
+        errorCannotAccessGameMemory();
+        return false;
+    }
+    auto offset = memory.indexOf(data);
+    if (offset < 0)
+    {
+        errorFailedSearchGameMemory();
+        return false;
+    }
+    return base + offset;
+#elif Q_OS_WIN
+#endif
 }
 
 bool MainWindow::hasSelectedProcess()
@@ -269,9 +357,19 @@ void MainWindow::errorAddressTooLong()
     QMessageBox::critical(this, "Critical Error", "Address (excluding port) cannot be longer than 44 characters.", QMessageBox::Ok);
 }
 
+void MainWindow::errorProcessInvalid()
+{
+    QMessageBox::critical(this, "Critical Error", "Process is invalid. Make sure the correct process is selected.", QMessageBox::Ok);
+}
+
 void MainWindow::errorCannotAccessGameMemory()
 {
     QMessageBox::critical(this, "Critical Error", "Cannot access game memory. Root permission may be required.", QMessageBox::Ok);
+}
+
+void MainWindow::errorFailedSearchGameMemory()
+{
+    QMessageBox::critical(this, "Critical Error", "Cannot find specific location in game memory. Game may need to restart.", QMessageBox::Ok);
 }
 
 void MainWindow::errorUnmatchedGameVersion()
