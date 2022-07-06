@@ -16,6 +16,14 @@ $ make release
 
 Executable is located in `build/`.
 
-## i18n
+## I18n
 
 Built-in English and 简体中文 (Simplified Chinese) translations.
+
+## License
+
+<img src="./license.svg" width="120">
+
+## Dependencies
+
+- [Qt](https://www.qt.io/) 5, licensed under GPLv3
