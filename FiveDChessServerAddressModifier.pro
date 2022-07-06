@@ -22,7 +22,7 @@ TRANSLATIONS += \
     FiveDChessServerAddressModifier_zh_CN.ts
 
 RESOURCES += \
-    license.svg
+    images/license.svg
 
 CONFIG += lrelease
 CONFIG += embed_translations
