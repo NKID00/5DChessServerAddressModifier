@@ -1,11 +1,6 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#ifdef Q_OS_WIN
-#define WIN32_LEAN_AND_MEAN
-#include <Windows.h>
-#endif
-
 #include <cstdint>
 
 #include <Qt>
@@ -20,17 +15,26 @@
 #include <QMainWindow>
 #include <QMessageBox>
 
+#ifdef Q_OS_WIN
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
+#include <psapi.h>
+#endif
+
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
 
 #ifdef Q_OS_LINUX
-using process_handle_t = QString;
-#elif Q_OS_WIN
-using process_handle_t = HANDLE;
+using process_type = QString;
+#elif defined Q_OS_WIN
+using process_type = HANDLE;
 #endif
 
-#define RET_VOID_ON_ERR(expr) if ((expr) <= 0) { return; }
+using result_type = int;
+constexpr result_type OK = 1;
+constexpr result_type ERR = -1;
+#define HANDLE_ERR(expr) if ((expr) <= 0) { closeProcess(process); return; }
 
 #define DEBUG(expr) { qDebug() << __FILE__ << __LINE__ << expr; }
 
@@ -60,13 +64,14 @@ private slots:
     void on_pushButtonModify_clicked();
 
 private:
-    bool processMemoryBaseSize(process_handle_t process, qint64 &base, qint64 &size);
-    bool readProcessMemory(process_handle_t process, qint64 addr, qint64 size, QByteArray &data);
-    bool writeProcessMemory(process_handle_t process, qint64 addr, const QByteArray &data);
-    qint64 searchProcessMemory(process_handle_t process, qint64 base, qint64 size, const QByteArray &data);
+    result_type processMemoryBaseSize(process_type process, qint64 &base, qint64 &size);
+    result_type readProcessMemory(process_type process, qint64 addr, qint64 size, QByteArray &data);
+    result_type writeProcessMemory(process_type process, qint64 addr, const QByteArray &data);
+    qint64 searchProcessMemory(process_type process, qint64 base, qint64 size, const QByteArray &data);
     bool hasSelectedProcess();
-    process_handle_t selectedProcess();
-    bool addressAndPort(QByteArray &address, QByteArray &port);
+    process_type openSelectedProcess();
+    void closeProcess(process_type process);
+    result_type addressAndPort(QByteArray &address, QByteArray &port);
     void infoProcessNotSelected();
     void infoSuccess();
     void errorAddressInvalid();

@@ -29,15 +29,11 @@
     </message>
     <message>
         <source>Server address modified successfully.</source>
-        <translation>成功修改服务器地址。</translation>
-    </message>
-    <message>
-        <source>Critical Error</source>
-        <translation>关键错误</translation>
+        <translation>修改服务器地址成功。</translation>
     </message>
     <message>
         <source>Address is invalid.</source>
-        <translation>无效地址。</translation>
+        <translation>地址无效。</translation>
     </message>
     <message>
         <source>Address (excluding port) cannot be longer than 44 characters.</source>
@@ -45,7 +41,7 @@
     </message>
     <message>
         <source>Process is invalid. Make sure the correct process is selected.</source>
-        <translation>无效进程。确保选中了正确的进程。</translation>
+        <translation>进程无效。确保选中了正确的进程。</translation>
     </message>
     <message>
         <source>Cannot access game memory. Root permission may be required.</source>
@@ -58,6 +54,18 @@
     <message>
         <source>Cannot access game memory.</source>
         <translation>无法访问游戏内存。</translation>
+    </message>
+    <message>
+        <source>Error</source>
+        <translation>错误</translation>
+    </message>
+    <message>
+        <source>&lt;a href=&quot;https://github.com/NKID00/5DChessServerAddressModifier&quot;&gt;Source Code&lt;/a&gt;</source>
+        <translation>&lt;a href=&quot;https://github.com/NKID00/5DChessServerAddressModifier&quot;&gt;源代码&lt;/a&gt;</translation>
+    </message>
+    <message>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;img src=&quot;:/license.svg&quot; width=&quot;150&quot;/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation></translation>
     </message>
 </context>
 </TS>

@@ -1,6 +1,6 @@
-QT       += core gui widgets
+QT += core gui widgets
 
-greaterThan(QT_MAJOR_VERSION, 5): QT += widgets
+QTPLUGIN += qsvg
 
 CONFIG += c++14
 
@@ -20,6 +20,9 @@ FORMS += \
 
 TRANSLATIONS += \
     FiveDChessServerAddressModifier_zh_CN.ts
+
+RESOURCES += \
+    license.svg
 
 CONFIG += lrelease
 CONFIG += embed_translations
