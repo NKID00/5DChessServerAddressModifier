@@ -1,10 +1,6 @@
 # **Unofficial** Tool for Modifying Server Address of [5D Chess With Multiverse Time Travel](https://store.steampowered.com/app/1349230/5D_Chess_With_Multiverse_Time_Travel/)
 
-## Screenshot
-
 <img src="./images/screenshot.png" width="360">
-
-## Notes
 
 For Linux users, root permission may be required to access game memory.
 
