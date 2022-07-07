@@ -10,7 +10,7 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    QObject::connect(QApplication::instance(), SIGNAL(focusChanged(QWidget *, QWidget *)), this, SLOT(on_focusChanged(QWidget *, QWidget *)));
+    QObject::connect(QApplication::instance(), SIGNAL(focusChanged(QWidget*, QWidget*)), this, SLOT(on_focusChanged(QWidget*, QWidget*)));
     on_pushButtonRefresh_clicked();
     QPalette palette;
     palette.setColor(QPalette::Text, Qt::GlobalColor::gray);
@@ -102,44 +102,13 @@ void MainWindow::on_pushButtonModify_clicked()
     }
     auto process = openSelectedProcess();
 #ifdef Q_OS_WIN
-    if (process == 0)
+    if (process == NULL)
     {
         return;
     }
 #endif
     qint64 base, size;
     HANDLE_ERR(processMemoryBaseSize(process, base, size));
-
-//    QByteArray version_bytes;
-//    HANDLE_ERR(readProcessMemory(process, base + OFFSET_VERSION_0, 9, version_bytes));
-//    if (version_bytes == VERSION_0)
-//    {
-//        HANDLE_ERR(readProcessMemory(process, base + OFFSET_VERSION_1, 8, version_bytes));
-//        qint64 version_1;
-//        QDataStream version_datastream(version_bytes);
-//        version_datastream.setByteOrder(QDataStream::LittleEndian);
-//        version_datastream >> version_1;
-//        if (version_1 == VERSION_1)
-//        {
-//            HANDLE_ERR(readProcessMemory(process, base + OFFSET_VERSION_2, 8, version_bytes));
-//            qint64 version_2;
-//            QDataStream version_datastream(version_bytes);
-//            version_datastream.setByteOrder(QDataStream::LittleEndian);
-//            version_datastream >> version_2;
-//            if (version_2 == VERSION_2)
-//            {
-//                QByteArray address;
-//                QByteArray port;
-//                HANDLE_ERR(addressAndPort(address, port));
-//                HANDLE_ERR(writeProcessMemory(process, base + OFFSET_ADDRESS, address));
-//                HANDLE_ERR(writeProcessMemory(process, base + OFFSET_PORT, port));
-//                infoSuccess();
-//                return;
-//            }
-//        }
-//    }
-//    errorUnmatchedGameVersion();
-
     QByteArray address, port;
     HANDLE_ERR(addressAndPort(address, port));
     if (address != OFFICIAL_ADDRESS)
@@ -318,7 +287,10 @@ result_type MainWindow::writeProcessMemory(process_type process, qint64 addr, co
 qint64 MainWindow::searchProcessMemory(process_type process, qint64 base, qint64 size, const QByteArray &data)
 {
     QByteArray memory;
-    readProcessMemory(process, base, size, memory);
+    if (readProcessMemory(process, base, size, memory) < 0)
+    {
+        return -1;
+    }
     auto offset = memory.indexOf(data);
     if (offset < 0)
     {
@@ -443,8 +415,3 @@ void MainWindow::errorFailedSearchGameMemory()
 {
     QMessageBox::critical(this, tr("Error"), tr("Cannot find specific location in game memory. Game may need to restart."), QMessageBox::Ok);
 }
-
-//void MainWindow::errorUnmatchedGameVersion()
-//{
-//    QMessageBox::critical(this, tr("Error"), tr("Only game version 1.1.0.0f-11-16 is supported."), QMessageBox::Ok);
-//}
