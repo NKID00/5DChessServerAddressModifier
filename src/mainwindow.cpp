@@ -300,9 +300,6 @@ result_type MainWindow::writeProcessMemory(process_type process, qint64 addr, co
         errorCannotAccessGameMemory();
         return ERR;
     }
-    qDebug() << old_protect;
-    errorCannotAccessGameMemory();
-    return ERR;
     SIZE_T write_size;
     if (!WriteProcessMemory(process, (LPVOID)addr, (LPCVOID)data.data(), (SIZE_T)data.size(), &write_size))
     {
@@ -320,36 +317,15 @@ result_type MainWindow::writeProcessMemory(process_type process, qint64 addr, co
 
 qint64 MainWindow::searchProcessMemory(process_type process, qint64 base, qint64 size, const QByteArray &data)
 {
-#ifdef Q_OS_LINUX
-    QFile f("/proc/" + process + "/mem");
-    if (!f.exists())
-    {
-        errorProcessInvalid();
-        return false;
-    }
-    f.open(QIODevice::ReadOnly);
-    if (!f.isOpen())
-    {
-        errorCannotAccessGameMemory();
-        return false;
-    }
-    f.seek(base);
-    auto memory = f.read(size);
-    if (memory.size() != size)
-    {
-        errorCannotAccessGameMemory();
-        return false;
-    }
+    QByteArray memory;
+    readProcessMemory(process, base, size, memory);
     auto offset = memory.indexOf(data);
     if (offset < 0)
     {
         errorFailedSearchGameMemory();
-        return false;
+        return -1;
     }
     return base + offset;
-#elif defined Q_OS_WIN
-    return 0;
-#endif
 }
 
 bool MainWindow::hasSelectedProcess()
@@ -363,7 +339,7 @@ process_type MainWindow::openSelectedProcess()
     return ui->comboBoxProcess->currentText();
 #elif defined Q_OS_WIN
     DWORD pid = ui->comboBoxProcess->currentText().toULong();
-    auto process = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ | PROCESS_VM_WRITE, FALSE, pid);
+    auto process = OpenProcess(PROCESS_ALL_ACCESS, FALSE, pid);
     if (process == NULL)
     {
         errorProcessInvalid();

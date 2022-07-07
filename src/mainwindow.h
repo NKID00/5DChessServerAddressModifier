@@ -17,7 +17,7 @@
 
 #ifdef Q_OS_WIN
 #define WIN32_LEAN_AND_MEAN
-#include <windows.h>
+#include <Windows.h>
 #include <psapi.h>
 #endif
 
@@ -34,7 +34,7 @@ using process_type = HANDLE;
 using result_type = int;
 constexpr result_type OK = 1;
 constexpr result_type ERR = -1;
-#define HANDLE_ERR(expr) if ((expr) <= 0) { closeProcess(process); return; }
+#define HANDLE_ERR(expr) if ((expr) < 0) { closeProcess(process); return; }
 
 #define DEBUG(expr) { qDebug() << __FILE__ << __LINE__ << expr; }
 
