@@ -61,11 +61,11 @@
     </message>
     <message>
         <source>&lt;a href=&quot;https://github.com/NKID00/5DChessServerAddressModifier&quot;&gt;Source Code&lt;/a&gt;</source>
-        <translation>&lt;a href=&quot;https://github.com/NKID00/5DChessServerAddressModifier&quot;&gt;源代碼&lt;/a&gt;</translation>
+        <translation>&lt;a href=&quot;https://github.com/NKID00/5DChessServerAddressModifier&quot;&gt;原始碼&lt;/a&gt;</translation>
     </message>
     <message>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;img src=&quot;:/images/license.svg&quot; width=&quot;120&quot;/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 </TS>
