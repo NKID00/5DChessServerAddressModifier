@@ -4,8 +4,6 @@
 
 For Linux users, root permission may be required to access game memory.
 
-Windows support is WIP.
-
 ## Build
 
 Install Qt 5.
