@@ -19,7 +19,10 @@ FORMS += \
     src/mainwindow.ui
 
 TRANSLATIONS += \
-    translations/FiveDChessServerAddressModifier_zh_CN.ts
+    translations/FiveDChessServerAddressModifier_en.ts \
+    translations/FiveDChessServerAddressModifier_zh_CN.ts \
+    translations/FiveDChessServerAddressModifier_zh_TW.ts \
+    translations/FiveDChessServerAddressModifier_zh_HK.ts
 
 RESOURCES += \
     images/license.svg

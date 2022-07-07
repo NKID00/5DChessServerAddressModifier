@@ -20,7 +20,7 @@ Executable is located in `build/`.
 
 ## I18n
 
-Built-in English and 简体中文 (Simplified Chinese) translations.
+Built-in English, 简体中文 (Simplified Chinese) and 繁體中文 (Tradition Chinese) translations.
 
 ## License
 
