@@ -53,6 +53,8 @@ compile_commands.json
 
 *_qmlcache.qrc
 
+.qtc_clangd/
+
 # Build
 build/
 [Dd]ebug/
