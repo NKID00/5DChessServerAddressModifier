@@ -64,7 +64,7 @@
         <translation></translation>
     </message>
     <message>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Version 0.1.0&lt;br/&gt;&lt;a href=&quot;https://github.com/NKID00/5DChessServerAddressModifier&quot;&gt;Source Code&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Version 0.1.1&lt;br/&gt;&lt;a href=&quot;https://github.com/NKID00/5DChessServerAddressModifier&quot;&gt;Source Code&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation></translation>
     </message>
 </context>
